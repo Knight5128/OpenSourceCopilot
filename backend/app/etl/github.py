@@ -16,6 +16,7 @@ import httpx
 
 from ..config import get_settings
 from ..schemas import GitHubIssue, GitHubPullRequest, RepoMeta
+from .cache import SQLiteHTTPCache
 
 
 class GitHubClient:
@@ -32,6 +33,7 @@ class GitHubClient:
         tokens: Sequence[str] | None = None,
         base_url: str | None = None,
         client: httpx.AsyncClient | None = None,
+        cache: SQLiteHTTPCache | None = None,
         timeout: float = 20.0,
         max_retries: int = 3,
     ) -> None:
@@ -49,10 +51,20 @@ class GitHubClient:
 
         self._owns_client = client is None
         self._client = client or httpx.AsyncClient(timeout=timeout)
+        self._cache = cache
+        self._owns_cache = False
+        if self._cache is None and self._owns_client:
+            self._cache = SQLiteHTTPCache(
+                settings.etl_cache_db_path,
+                ttl_seconds=settings.etl_cache_ttl_seconds,
+            )
+            self._owns_cache = True
 
     async def aclose(self) -> None:
         if self._owns_client:
             await self._client.aclose()
+        if self._owns_cache and self._cache is not None:
+            self._cache.aclose()
 
     async def __aenter__(self) -> GitHubClient:
         return self
@@ -67,9 +79,17 @@ class GitHubClient:
         return self.tokens[self._token_index]
 
     async def _get(self, path: str, **params: Any) -> Any:
+        if self._cache is not None:
+            cached_payload = self._cache.get("GET", path, params)
+            if cached_payload is not None:
+                return cached_payload
+
         resp = await self._request("GET", path, params=params)
         resp.raise_for_status()
-        return resp.json()
+        payload = resp.json()
+        if self._cache is not None:
+            self._cache.set("GET", path, params, payload)
+        return payload
 
     async def _request(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
         url = f"{self.base}{path}"

@@ -4,7 +4,7 @@
 > **维护约定**：每完成一个子功能，**在同一次 PR 中**勾选对应 checkbox 并更新「最近更新」一行；新需求先进入 §11 待规划区，再分配到模块。
 > 与 `README.md` §5 的对应关系：README 的状态表是**面向首次访问者的概览**，本 SPEC 是**面向开发者的实施清单**。两者用 `SPEC-ID` 串联（形如 `M3-RAG-02`）。
 
-- **最近更新**：2026-05-19 · 完成 M1-ETL-01~03（GitHub 客户端、仓库元数据、Issue/PR 拉取）
+- **最近更新**：2026-05-19 · 完成 M1-ETL-01~04（GitHub 客户端、仓库元数据、Issue/PR 拉取、SQLite 全量缓存）
 - **状态图例**：⚪ 未开始 / 🟡 进行中 / 🟢 已完成 / 🔴 阻塞 / ⏸ 暂缓
 
 ---
@@ -32,7 +32,7 @@
 | M1-ETL-01 | GitHub REST 客户端封装（带 token 轮询 + 限流退避） | 🟢 | 单 token 用尽自动切换；429 走指数退避；单元测 mock 限流响应 |
 | M1-ETL-02 | 仓库元数据采集（stars / topics / license / 主语言） | 🟢 | 给定 owner/repo 入参可返回 `RepoMeta` Pydantic 对象 |
 | M1-ETL-03 | Issue & PR 批量拉取（含 labels、author_association、comments） | 🟢 | 支持增量更新（since 参数），10 仓库 × 100 条 < 5 min |
-| M1-ETL-04 | SQLite 全量缓存（`data/cache.db`） | ⚪ | 二次访问命中率 ≥ 95%；schema 版本化 |
+| M1-ETL-04 | SQLite 全量缓存（`data/cache.db`） | 🟢 | 二次访问命中率 ≥ 95%；schema 版本化 |
 | M1-ETL-05 | tree-sitter 代码 AST 解析（Python / TS 优先） | ⚪ | 每文件输出 `Function` 节点 + `Function-CALLS->Function` 关系 |
 | M1-ETL-06 | 种子仓库脚本 `scripts/seed_repos.py` | ⚪ | `python scripts/seed_repos.py --config configs/seed.yaml` 一键灌库 |
 | M1-ETL-07 | 异常 & 重试上报（日志结构化） | ⚪ | 用 `loguru` 输出 JSON 行；失败任务进死信表 |
@@ -274,5 +274,6 @@
 
 | 日期 | 改动 | 作者 |
 |---|---|---|
+| 2026-05-19 | 完成 M1-ETL-04：新增 `SQLiteHTTPCache`（`data/cache.db`），实现 GET 响应持久化缓存与 schema 版本化 | D |
 | 2026-05-19 | 完成 M1-ETL-01~03：GitHub REST 客户端、`RepoMeta` / `GitHubIssue` / `GitHubPullRequest` schema、Issue/PR 分页拉取与 mock 测试 | D |
 | 2026-05-19 | 初始化 SPEC，分 9 个模块 + backlog | 全员 |

@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import asyncio
+import sqlite3
 from datetime import datetime, timezone
 
 import httpx
 
+from backend.app.etl.cache import SQLiteHTTPCache
 from backend.app.etl.github import GitHubClient
 
 
@@ -163,5 +165,38 @@ def test_list_pulls_filters_since_locally() -> None:
 
         assert [pull.number for pull in pulls] == [2]
         assert pulls[0].changed_files == 3
+
+    asyncio.run(run())
+
+
+def test_sqlite_cache_hits_on_second_call(tmp_path) -> None:
+    async def run() -> None:
+        calls = 0
+        cache = SQLiteHTTPCache(tmp_path / "cache.db", ttl_seconds=600)
+
+        def handler(_request: httpx.Request) -> httpx.Response:
+            nonlocal calls
+            calls += 1
+            return httpx.Response(200, json=_repo_payload())
+
+        transport = httpx.MockTransport(handler)
+        async with httpx.AsyncClient(transport=transport) as http_client:
+            client = GitHubClient(client=http_client, cache=cache)
+            first = await client.get_repo("owner/repo")
+            second = await client.get_repo("owner/repo")
+            await client.aclose()
+
+        assert calls == 1
+        assert first.id == second.id
+
+        conn = sqlite3.connect(tmp_path / "cache.db")
+        try:
+            row = conn.execute(
+                "SELECT value FROM schema_meta WHERE key = 'schema_version'"
+            ).fetchone()
+        finally:
+            conn.close()
+        assert row is not None
+        assert row[0] == str(SQLiteHTTPCache.SCHEMA_VERSION)
 
     asyncio.run(run())

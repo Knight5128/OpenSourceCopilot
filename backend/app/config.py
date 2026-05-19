@@ -47,6 +47,8 @@ class Settings(BaseSettings):
         default="langchain-ai/langchain,tiangolo/fastapi",
         description="Comma-separated list of `owner/repo` strings.",
     )
+    etl_cache_db_path: str = "data/cache.db"
+    etl_cache_ttl_seconds: int = 86400
 
     @property
     def seed_repo_list(self) -> list[str]:
