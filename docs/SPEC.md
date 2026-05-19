@@ -4,7 +4,7 @@
 > **维护约定**：每完成一个子功能，**在同一次 PR 中**勾选对应 checkbox 并更新「最近更新」一行；新需求先进入 §11 待规划区，再分配到模块。
 > 与 `README.md` §5 的对应关系：README 的状态表是**面向首次访问者的概览**，本 SPEC 是**面向开发者的实施清单**。两者用 `SPEC-ID` 串联（形如 `M3-RAG-02`）。
 
-- **最近更新**：2026-05-19 · 完成 M1-ETL-01~07（GitHub 客户端、仓库元数据、Issue/PR 拉取、SQLite 全量缓存、AST 解析、seed 脚本、异常重试上报）
+- **最近更新**：2026-05-19 · 完成 M2-KG-02~06（Neo4j 异步连接池与重试、批量写入器、具名 Cypher 查询、`/api/v1/kg/stats`、`/api/v1/kg/subgraph`）
 - **状态图例**：⚪ 未开始 / 🟡 进行中 / 🟢 已完成 / 🔴 阻塞 / ⏸ 暂缓
 
 ---
@@ -48,11 +48,11 @@
 | SPEC-ID | 子功能 | 状态 | 验收标准 |
 |---|---|---|---|
 | M2-KG-01 | 本体定义（7 实体 + 8 关系）+ 约束 / 索引 | 🟢 | `schema.py` 已存在；启动时自动 `CREATE CONSTRAINT` |
-| M2-KG-02 | Neo4j 异步客户端（连接池 + 重试） | 🟡 | `client.py` 骨架就绪；待补连接池配置 |
-| M2-KG-03 | 批量写入器（`UNWIND` + APOC 事务） | ⚪ | 单事务 ≥ 5k 节点，失败回滚 |
-| M2-KG-04 | 常用 Cypher 查询封装（issue→module 邻接、PR→file 影响域） | ⚪ | 提供 6 个具名查询函数，每个有 docstring + 单测 |
-| M2-KG-05 | 图谱健康检查端点 `/api/v1/kg/stats` | ⚪ | 返回各类节点 / 边计数，供前端徽章展示 |
-| M2-KG-06 | 子图导出接口（前端 Cytoscape 用） | ⚪ | 给定中心节点 + 跳数返回 `{nodes, edges}` JSON |
+| M2-KG-02 | Neo4j 异步客户端（连接池 + 重试） | 🟢 | `client.py` 已支持 AsyncDriver 连接池、指数退避重试、约束初始化 |
+| M2-KG-03 | 批量写入器（`UNWIND` + APOC 事务） | 🟢 | 新增 `KGBatchWriter`，默认 batch size=5000，APOC 不可用时自动降级 `UNWIND` |
+| M2-KG-04 | 常用 Cypher 查询封装（issue→module 邻接、PR→file 影响域） | 🟢 | 新增 6 个具名查询函数，均有 docstring + 单测 |
+| M2-KG-05 | 图谱健康检查端点 `/api/v1/kg/stats` | 🟢 | 返回节点/关系计数；Neo4j 异常时返回 `degraded=true` |
+| M2-KG-06 | 子图导出接口（前端 Cytoscape 用） | 🟢 | 支持 `center+hops+limit` 返回 `{nodes, edges, degraded}` |
 
 ---
 
@@ -274,6 +274,7 @@
 
 | 日期 | 改动 | 作者 |
 |---|---|---|
+| 2026-05-19 | 完成 M2-KG-02~06：实现 Neo4j 异步连接池与重试、批量写入器（APOC+UNWIND 回退）、6 个具名 Cypher 查询、`/api/v1/kg/stats` 与 `/api/v1/kg/subgraph` 端点及测试 | D |
 | 2026-05-19 | 完成 M1-ETL-05~07：新增 tree-sitter AST 解析、`scripts/seed_repos.py` 一键灌库、`loguru` JSON 日志与死信表 | D |
 | 2026-05-19 | 完成 M1-ETL-04：新增 `SQLiteHTTPCache`（`data/cache.db`），实现 GET 响应持久化缓存与 schema 版本化 | D |
 | 2026-05-19 | 完成 M1-ETL-01~03：GitHub REST 客户端、`RepoMeta` / `GitHubIssue` / `GitHubPullRequest` schema、Issue/PR 分页拉取与 mock 测试 | D |

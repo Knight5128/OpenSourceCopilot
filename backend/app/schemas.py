@@ -125,3 +125,30 @@ class OnboardingPlan(BaseModel):
     summary: str
     citations: list[Citation]
     trace: list[AgentTrace] = Field(default_factory=list)
+
+
+class KGStatsResponse(BaseModel):
+    nodes: dict[str, int] = Field(default_factory=dict)
+    edges: dict[str, int] = Field(default_factory=dict)
+    degraded: bool = False
+
+
+class KGSubgraphNode(BaseModel):
+    id: str
+    label: str
+    key: str
+    props: dict = Field(default_factory=dict)
+
+
+class KGSubgraphEdge(BaseModel):
+    id: str
+    source: str
+    target: str
+    type: str
+    props: dict = Field(default_factory=dict)
+
+
+class KGSubgraphResponse(BaseModel):
+    nodes: list[KGSubgraphNode] = Field(default_factory=list)
+    edges: list[KGSubgraphEdge] = Field(default_factory=list)
+    degraded: bool = False

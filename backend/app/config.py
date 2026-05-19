@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     neo4j_uri: str = "bolt://localhost:7687"
     neo4j_user: str = "neo4j"
     neo4j_password: str = "changeme"
+    neo4j_pool_size: int = 50
+    neo4j_connection_timeout: float = 15.0
+    neo4j_max_transaction_retry_time: float = 15.0
+    neo4j_request_retries: int = 3
+    neo4j_request_retry_backoff_seconds: float = 0.5
+    neo4j_request_retry_max_backoff_seconds: float = 3.0
+
+    # KG ingestion
+    kg_batch_size: int = 5000
 
     # Milvus
     milvus_host: str = "localhost"
