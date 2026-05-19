@@ -137,7 +137,7 @@ pytest -q
 |---|---|---|---|
 | 项目骨架 + 文档 | ✅ Done | 全员 | — |
 | Neo4j Schema | ✅ 已定义本体 | D | [M2](docs/SPEC.md#2--m2--知识图谱neo4j) |
-| GitHub ETL | 🟡 接口契约就绪，实现待补 | D | [M1](docs/SPEC.md#1--m1--数据采集与缓存etl) |
+| GitHub ETL | ✅ 已完成（缓存 / AST / seed / 日志重试） | D | [M1](docs/SPEC.md#1--m1--数据采集与缓存etl) |
 | 向量库 + 嵌入封装 | 🟡 客户端就绪，入库待补 | B | [M3](docs/SPEC.md#3--m3--向量库与嵌入) |
 | HybridRAG 三路检索 | ⚪ 待开发（Week 2） | B | [M5](docs/SPEC.md#5--m5--hybridrag招牌-) |
 | GCN 模型骨架 | 🟡 模型类就绪，训练待补（Week 3） | A | [M4](docs/SPEC.md#4--m4--gcn--gat-图学习招牌-) |

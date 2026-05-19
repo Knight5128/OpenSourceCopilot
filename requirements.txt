@@ -11,6 +11,7 @@ tenacity>=9.0.0
 neo4j>=5.23.0
 pymilvus>=2.4.0
 sqlalchemy>=2.0.30
+pyyaml>=6.0.2
 
 # ===== NLP / LLM =====
 openai>=1.40.0            # works for OpenAI/DeepSeek-compatible APIs
@@ -40,3 +41,4 @@ rank-bm25>=0.2.2
 # ===== Dev =====
 pytest>=8.3.0
 ruff>=0.6.0
+loguru>=0.7.2

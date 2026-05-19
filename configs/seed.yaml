@@ -1,0 +1,16 @@
+repos:
+  - langchain-ai/langchain
+  - tiangolo/fastapi
+
+db_path: data/cache.db
+issue_state: all
+pull_state: closed
+per_page: 100
+max_retries: 3
+retry_base_seconds: 0.5
+
+# Optional local repositories/directories to parse with tree-sitter
+# and persist Function / Function-CALLS->Function relations.
+local_code_roots:
+  - repo: OpenSourceCopilot/local
+    path: .
