@@ -59,7 +59,7 @@ OpenSourceCopilot/
 ├── docker-compose.yml       ← Neo4j + Milvus 一键启动
 ├── .env.example             ← 环境变量模板
 ├── pyproject.toml           ← Python 项目元数据
-├── requirements.txt         ← Python 依赖清单
+├── uv.lock                  ← uv 锁文件
 ├── backend/
 │   ├── app/
 │   │   ├── main.py          ← FastAPI 入口
@@ -85,6 +85,7 @@ OpenSourceCopilot/
 ## 4 · 快速开始
 
 > 全流程在 Windows / macOS / Linux 上均可运行；下方示例以 Windows + PowerShell 为主。
+> 默认使用 `uv` 管理 Python 虚拟环境；前端启动命令仍需要本机已安装 Node.js / npm。
 
 ### 4.1 准备环境变量
 
@@ -105,26 +106,22 @@ docker compose up -d
 ### 4.3 后端
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn backend.app.main:app --reload --port 8000
+uv sync
+uv run uvicorn backend.app.main:app --reload --port 8000
 # 健康检查：http://localhost:8000/api/v1/health
 ```
 
 ### 4.4 前端
 
 ```powershell
-cd frontend
-npm install
-npm run dev
+uv run python scripts/dev_frontend.py
 # 打开 http://localhost:5173
 ```
 
 ### 4.5 跑测试
 
 ```powershell
-pytest -q
+uv run pytest -q
 ```
 
 ---
@@ -163,7 +160,7 @@ pytest -q
 
 ## 7 · 开发规范
 
-- **Python**：`ruff` 统一格式与 lint；`pytest` 跑测试
+- **Python**：默认使用 `uv` 管理 `.venv` 与依赖；`ruff` 统一格式与 lint；`pytest` 跑测试
 - **提交**：使用 conventional commit，例如 `feat: add hybrid retriever`
 - **分支**：`main` 保持可运行；feature 分支命名 `feat/<member>-<topic>`
 - **密钥**：永远不要提交 `.env`；用 `.env.example` 维护字段约定
