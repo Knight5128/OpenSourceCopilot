@@ -21,8 +21,15 @@ class Settings(BaseSettings):
     llm_base_url: str = "https://api.deepseek.com"
 
     # Embeddings
+    embedding_backend: str = "local"
     embedding_text_model: str = "BAAI/bge-base-zh-v1.5"
     embedding_code_model: str = "microsoft/unixcoder-base"
+    embedding_api_key: str = ""
+    embedding_api_base_url: str = ""
+    embedding_api_text_model: str = ""
+    embedding_api_code_model: str = ""
+    embedding_cache_db_path: str = "data/embedding_cache.db"
+    embedding_dim: int = 768
 
     # GitHub
     github_token: str = ""
@@ -45,6 +52,11 @@ class Settings(BaseSettings):
     # Milvus
     milvus_host: str = "localhost"
     milvus_port: int = 19530
+    milvus_index_type: str = "IVF_FLAT"
+    milvus_metric_type: str = "IP"
+    milvus_index_nlist: int = 128
+    milvus_search_nprobe: int = 16
+    milvus_batch_size: int = 1000
 
     # Application
     backend_host: str = "0.0.0.0"

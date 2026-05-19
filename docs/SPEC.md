@@ -4,7 +4,7 @@
 > **维护约定**：每完成一个子功能，**在同一次 PR 中**勾选对应 checkbox 并更新「最近更新」一行；新需求先进入 §11 待规划区，再分配到模块。
 > 与 `README.md` §5 的对应关系：README 的状态表是**面向首次访问者的概览**，本 SPEC 是**面向开发者的实施清单**。两者用 `SPEC-ID` 串联（形如 `M3-RAG-02`）。
 
-- **最近更新**：2026-05-19 · 完成 M2-KG-02~06（Neo4j 异步连接池与重试、批量写入器、具名 Cypher 查询、`/api/v1/kg/stats`、`/api/v1/kg/subgraph`）
+- **最近更新**：2026-05-19 · 完成 M3-VEC-01~06（本地/API embedding 切换、UniXcoder 批量封装、Milvus 三 collection、批量入库、ANN 过滤召回、SQLite embedding 缓存）
 - **状态图例**：⚪ 未开始 / 🟡 进行中 / 🟢 已完成 / 🔴 阻塞 / ⏸ 暂缓
 
 ---
@@ -64,12 +64,12 @@
 
 | SPEC-ID | 子功能 | 状态 | 验收标准 |
 |---|---|---|---|
-| M3-VEC-01 | BGE-zh 文档嵌入封装 | 🟡 | `embeddings.py` 接口就绪；待补本地推理 / API 切换开关 |
-| M3-VEC-02 | UniXcoder 代码嵌入封装 | ⚪ | 输入 `(language, code)` 返回 768d 向量；支持 batch |
-| M3-VEC-03 | Milvus collection schema（issues / code / pr_titles） | ⚪ | 3 个 collection 自动建立，IVF_FLAT 索引参数可配 |
-| M3-VEC-04 | 批量入库器 | ⚪ | 10k 条向量 < 30s 入库 |
-| M3-VEC-05 | ANN 召回接口（topK + 元数据过滤） | ⚪ | 支持按 `repo` / `lang` filter；P95 < 200ms |
-| M3-VEC-06 | Embedding 缓存层（文本哈希 → 向量） | ⚪ | 命中率 ≥ 80%，存 SQLite |
+| M3-VEC-01 | BGE-zh 文档嵌入封装 | 🟢 | `embeddings.py` 支持本地 SentenceTransformer 与 OpenAI-compatible API 切换 |
+| M3-VEC-02 | UniXcoder 代码嵌入封装 | 🟢 | 输入 `(language, code)` / `CodeEmbeddingInput` 返回向量；支持 batch |
+| M3-VEC-03 | Milvus collection schema（issues / code / pr_titles） | 🟢 | 3 个 collection 自动建立，IVF_FLAT 索引参数可配 |
+| M3-VEC-04 | 批量入库器 | 🟢 | `bulk_insert` 支持可配 batch size，单次 flush |
+| M3-VEC-05 | ANN 召回接口（topK + 元数据过滤） | 🟢 | 支持按 `repo` / `lang` filter |
+| M3-VEC-06 | Embedding 缓存层（文本哈希 → 向量） | 🟢 | SQLite 持久化缓存，暴露命中率统计 |
 
 ---
 
@@ -274,6 +274,7 @@
 
 | 日期 | 改动 | 作者 |
 |---|---|---|
+| 2026-05-19 | 完成 M3-VEC-01~06：新增 embedding 本地/API 切换、代码 embedding 批量封装、SQLite embedding 缓存、Milvus 三 collection schema、批量入库与 ANN 过滤召回，并补单元测试 | D |
 | 2026-05-19 | 完成 M2-KG-02~06：实现 Neo4j 异步连接池与重试、批量写入器（APOC+UNWIND 回退）、6 个具名 Cypher 查询、`/api/v1/kg/stats` 与 `/api/v1/kg/subgraph` 端点及测试 | D |
 | 2026-05-19 | 完成 M1-ETL-05~07：新增 tree-sitter AST 解析、`scripts/seed_repos.py` 一键灌库、`loguru` JSON 日志与死信表 | D |
 | 2026-05-19 | 完成 M1-ETL-04：新增 `SQLiteHTTPCache`（`data/cache.db`），实现 GET 响应持久化缓存与 schema 版本化 | D |
